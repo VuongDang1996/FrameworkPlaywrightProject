@@ -127,8 +127,8 @@ This framework includes **26 comprehensive test cases** covering all major funct
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd PlaywrightFramework
+   git clone https://github.com/VuongDang1996/FrameworkPlaywrightProject.git
+   cd FrameworkPlaywrightProject
    ```
 
 2. **Install dependencies**
@@ -434,129 +434,6 @@ For questions and support:
 
 ---
 
-**Happy Testing with Allure! 🎭📊**
-
-## 📁 Project Structure
-
-```
-playwright-pom-framework/
-├── .github/
-│   ├── workflows/
-│   │   ├── playwright.yml          # Main CI/CD workflow
-│   │   └── playwright-sharded.yml  # Sharded test execution
-│   └── copilot-instructions.md     # Project setup instructions
-├── tests/
-│   ├── pages/                      # Page Object classes
-│   │   ├── auth/
-│   │   │   └── LoginPage.ts        # Login page object
-│   │   ├── components/             # Reusable components
-│   │   │   ├── NavigationComponent.ts
-│   │   │   └── FooterComponent.ts
-│   │   ├── base/
-│   │   │   └── BasePage.ts         # Base page class
-│   │   └── HomePage.ts             # Home page object
-│   ├── fixtures/                   # Custom fixtures
-│   │   ├── page-fixtures.ts        # Page object fixtures
-│   │   └── auth-fixtures.ts        # Authentication fixtures
-│   ├── specs/                      # Test specifications
-│   │   └── auth/
-│   │       └── login.spec.ts       # Login tests
-│   ├── interfaces/                 # TypeScript interfaces
-│   │   └── index.ts               # Common interfaces
-│   └── utils/                      # Utility functions
-├── playwright.config.ts            # Playwright configuration
-├── global-setup.ts                 # Global setup script
-├── global-teardown.ts              # Global teardown script
-├── package.json                    # Dependencies and scripts
-├── tsconfig.json                   # TypeScript configuration
-├── .eslintrc.json                  # ESLint configuration
-├── .prettierrc.json                # Prettier configuration
-├── .gitignore                      # Git ignore rules
-├── .env.example                    # Environment variables template
-└── README.md                       # This file
-```
-
-## 🛠️ Installation
-
-### Prerequisites
-
-- Node.js 18.x or later
-- npm or yarn package manager
-
-### Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd playwright-pom-framework
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Install Playwright browsers**
-   ```bash
-   npm run install-browsers
-   ```
-
-4. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-## 🎮 Usage
-
-### Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run Automation Exercise tests specifically
-npm test -- tests/specs/automation-exercise/
-
-# Run tests in headed mode
-npm run test:headed
-
-# Run specific test case
-npm test -- --grep "TC01 - Register User"
-
-# Run tests with specific tags
-npm run test:smoke
-npm run test:regression
-
-# Run tests with debug mode
-npm run test:debug
-
-# Run tests with UI mode
-npm run test:ui
-
-# Run tests on specific browser
-npm run test:chrome
-npm run test:firefox
-npm run test:safari
-
-# Run mobile tests
-npm run test:mobile
-```
-
-### Automation Exercise Test Cases
-
-The framework includes comprehensive tests for the Automation Exercise website with 26 test cases covering:
-
-- **Authentication**: User registration, login, logout (TC01-TC05)
-- **Navigation**: Contact form, test cases page (TC06-TC07)  
-- **Products**: Product browsing, search, reviews (TC08-TC09, TC21)
-- **Shopping Cart**: Add/remove products, quantity verification (TC12-TC13, TC17, TC22)
-- **Subscription**: Newsletter subscription on different pages (TC10-TC11)
-- **UI Features**: Scroll functionality, category browsing (TC25-TC26, TC18-TC19)
-
-See [AUTOMATION_EXERCISE_GUIDE.md](./AUTOMATION_EXERCISE_GUIDE.md) for detailed implementation guide.
-
-### Development
 
 ```bash
 # Type checking
