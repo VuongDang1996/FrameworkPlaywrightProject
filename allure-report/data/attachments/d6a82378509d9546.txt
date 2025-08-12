@@ -1,0 +1,3 @@
+No dialog appeared, continuing...
+Success message not visible, but form submission completed
+Home button click might have timed out, navigating directly to home

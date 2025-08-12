@@ -1,0 +1,44 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - link "Website for automation practice":
+    - /url: /
+    - img "Website for automation practice"
+  - list:
+    - listitem:
+      - link " Home":
+        - /url: /
+    - listitem:
+      - link " Products":
+        - /url: /products
+    - listitem:
+      - link " Cart":
+        - /url: /view_cart
+    - listitem:
+      - link " Signup / Login":
+        - /url: /login
+    - listitem:
+      - link " Test Cases":
+        - /url: /test_cases
+    - listitem:
+      - link " API Testing":
+        - /url: /api_list
+    - listitem:
+      - link " Video Tutorials":
+        - /url: https://www.youtube.com/c/AutomationExercise
+    - listitem:
+      - link " Contact us":
+        - /url: /contact_us
+- heading "Account Deleted!" [level=2]
+- paragraph: Your account has been permanently deleted!
+- paragraph: You can create new account to take advantage of member privileges to enhance your online shopping experience with us.
+- link "Continue":
+  - /url: /
+- contentinfo:
+  - heading "Subscription" [level=2]
+  - textbox "Your email address"
+  - button ""
+  - paragraph: Get the most recent updates from our site and be updated your self...
+  - paragraph: Copyright © 2021 All rights reserved
+```

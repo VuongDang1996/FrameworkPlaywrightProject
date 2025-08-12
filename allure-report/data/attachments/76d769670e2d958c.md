@@ -1,0 +1,127 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - link "Website for automation practice":
+    - /url: /
+    - img "Website for automation practice"
+  - list:
+    - listitem:
+      - link " Home":
+        - /url: /
+    - listitem:
+      - link " Products":
+        - /url: /products
+    - listitem:
+      - link " Cart":
+        - /url: /view_cart
+    - listitem:
+      - link " Logout":
+        - /url: /logout
+    - listitem:
+      - link " Delete Account":
+        - /url: /delete_account
+    - listitem:
+      - link " Test Cases":
+        - /url: /test_cases
+    - listitem:
+      - link " API Testing":
+        - /url: /api_list
+    - listitem:
+      - link " Video Tutorials":
+        - /url: https://www.youtube.com/c/AutomationExercise
+    - listitem:
+      - link " Contact us":
+        - /url: /contact_us
+    - listitem:  Logged in as vanvuongbtm@gmail.com
+- list:
+  - listitem:
+    - link "Home":
+      - /url: /
+  - listitem: Shopping Cart
+- text: Proceed To Checkout
+- table:
+  - rowgroup:
+    - row "Item Description Price Quantity Total":
+      - cell "Item"
+      - cell "Description"
+      - cell "Price"
+      - cell "Quantity"
+      - cell "Total"
+      - cell
+  - rowgroup:
+    - row "Product Image Blue Top Women > Tops Rs. 500 6 Rs. 3000 ":
+      - cell "Product Image":
+        - link "Product Image":
+          - /url: ""
+          - img "Product Image"
+      - cell "Blue Top Women > Tops":
+        - heading "Blue Top" [level=4]:
+          - link "Blue Top":
+            - /url: /product_details/1
+        - paragraph: Women > Tops
+      - cell "Rs. 500":
+        - paragraph: Rs. 500
+      - cell "6":
+        - button "6"
+      - cell "Rs. 3000":
+        - paragraph: Rs. 3000
+      - cell ""
+    - row "Product Image Men Tshirt Men > Tshirts Rs. 400 5 Rs. 2000 ":
+      - cell "Product Image":
+        - link "Product Image":
+          - /url: ""
+          - img "Product Image"
+      - cell "Men Tshirt Men > Tshirts":
+        - heading "Men Tshirt" [level=4]:
+          - link "Men Tshirt":
+            - /url: /product_details/2
+        - paragraph: Men > Tshirts
+      - cell "Rs. 400":
+        - paragraph: Rs. 400
+      - cell "5":
+        - button "5"
+      - cell "Rs. 2000":
+        - paragraph: Rs. 2000
+      - cell ""
+    - row "Product Image Sleeves Printed Top - White Kids > Tops & Shirts Rs. 499 5 Rs. 2495 ":
+      - cell "Product Image":
+        - link "Product Image":
+          - /url: ""
+          - img "Product Image"
+      - cell "Sleeves Printed Top - White Kids > Tops & Shirts":
+        - heading "Sleeves Printed Top - White" [level=4]:
+          - link "Sleeves Printed Top - White":
+            - /url: /product_details/11
+        - paragraph: Kids > Tops & Shirts
+      - cell "Rs. 499":
+        - paragraph: Rs. 499
+      - cell "5":
+        - button "5"
+      - cell "Rs. 2495":
+        - paragraph: Rs. 2495
+      - cell ""
+    - row "Product Image Half Sleeves Top Schiffli Detailing - Pink Kids > Tops & Shirts Rs. 359 5 Rs. 1795 ":
+      - cell "Product Image":
+        - link "Product Image":
+          - /url: ""
+          - img "Product Image"
+      - cell "Half Sleeves Top Schiffli Detailing - Pink Kids > Tops & Shirts":
+        - heading "Half Sleeves Top Schiffli Detailing - Pink" [level=4]:
+          - link "Half Sleeves Top Schiffli Detailing - Pink":
+            - /url: /product_details/12
+        - paragraph: Kids > Tops & Shirts
+      - cell "Rs. 359":
+        - paragraph: Rs. 359
+      - cell "5":
+        - button "5"
+      - cell "Rs. 1795":
+        - paragraph: Rs. 1795
+      - cell ""
+- contentinfo:
+  - heading "Subscription" [level=2]
+  - textbox "Your email address"
+  - button ""
+  - paragraph: Get the most recent updates from our site and be updated your self...
+  - paragraph: Copyright © 2021 All rights reserved
+```

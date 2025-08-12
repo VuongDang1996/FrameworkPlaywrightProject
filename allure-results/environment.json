@@ -1,0 +1,10 @@
+{
+  "Browser": "chromium",
+  "Test Environment": "automation-exercise",
+  "Base URL": "http://automationexercise.com",
+  "Test Framework": "Playwright",
+  "Language": "TypeScript",
+  "Pattern": "Page Object Model",
+  "CI/CD": "GitHub Actions",
+  "Reporting": "Allure Reports"
+}

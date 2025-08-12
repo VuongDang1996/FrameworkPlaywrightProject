@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Network Issues",
+    "messageRegex": ".*timeout.*|.*network.*|.*connection.*|.*ERR_NETWORK.*",
+    "traceRegex": ".*timeout.*|.*network.*|.*connection.*",
+    "description": "Tests failed due to network connectivity or timeout issues"
+  },
+  {
+    "name": "Element Not Found", 
+    "messageRegex": ".*locator.*not found.*|.*element.*not visible.*|.*strict mode violation.*",
+    "traceRegex": ".*locator.*not found.*|.*element.*not visible.*",
+    "description": "Tests failed because expected UI elements were not found or visible"
+  },
+  {
+    "name": "Assertion Failures",
+    "messageRegex": ".*expect.*|.*assertion.*|.*toBe.*|.*toContain.*",
+    "traceRegex": ".*expect.*|.*assertion.*",
+    "description": "Tests failed due to assertion/expectation mismatches"
+  },
+  {
+    "name": "Authentication Issues",
+    "messageRegex": ".*auth.*|.*login.*|.*unauthorized.*|.*credential.*",
+    "traceRegex": ".*auth.*|.*login.*|.*unauthorized.*",
+    "description": "Tests failed due to authentication or authorization problems"
+  },
+  {
+    "name": "Page Load Issues",
+    "messageRegex": ".*navigation.*|.*page.*load.*|.*ready.*state.*",
+    "traceRegex": ".*navigation.*|.*page.*load.*",
+    "description": "Tests failed due to page loading or navigation issues"
+  },
+  {
+    "name": "Browser Issues",
+    "messageRegex": ".*browser.*crash.*|.*browser.*disconnect.*|.*target.*closed.*",
+    "traceRegex": ".*browser.*crash.*|.*browser.*disconnect.*",
+    "description": "Tests failed due to browser crashes or disconnections"
+  }
+]
