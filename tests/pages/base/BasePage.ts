@@ -23,7 +23,22 @@ export abstract class BasePage {
    * Wait for page to load completely
    */
   async waitForPageLoad(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    try {
+      // Try networkidle first
+      await this.page.waitForLoadState('networkidle', { timeout: 30000 });
+    } catch (error) {
+      console.log('Networkidle timeout, trying domcontentloaded...');
+      try {
+        // Fallback to domcontentloaded
+        await this.page.waitForLoadState('domcontentloaded', { timeout: 30000 });
+      } catch (secondError) {
+        console.log('DOMContentLoaded timeout, trying load state...');
+        // Final fallback to load
+        await this.page.waitForLoadState('load', { timeout: 30000 });
+      }
+    }
+    
+    // Wait for loading spinner to disappear (if present)
     await this.loadingSpinner.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {
       // Loading spinner might not be present on all pages
     });

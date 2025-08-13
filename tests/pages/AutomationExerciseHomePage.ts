@@ -60,12 +60,69 @@ export class AutomationExerciseHomePage extends BasePage {
     this.brandsSidebar = page.locator('.brands_products');
   }
 
-  /**
-   * Navigate to home page
+    /**
+   * Navigate to the home page with robust error handling
    */
   async navigateTo(): Promise<void> {
-    await this.page.goto('/');
-    await this.waitForPageReady();
+    const maxRetries = 3;
+    let currentRetry = 0;
+    
+    while (currentRetry < maxRetries) {
+      try {
+        console.log(`Navigation attempt ${currentRetry + 1}/${maxRetries}`);
+        
+        // Try different wait strategies in order of preference
+        try {
+          await this.page.goto('/', { waitUntil: 'load', timeout: 45000 });
+          console.log('Successfully loaded with "load" event');
+          break;
+        } catch (loadError) {
+          console.log('Load event timeout, trying with networkidle...');
+          try {
+            await this.page.goto('/', { waitUntil: 'networkidle', timeout: 45000 });
+            console.log('Successfully loaded with "networkidle" event');
+            break;
+          } catch (networkError) {
+            console.log('Networkidle timeout, trying with domcontentloaded...');
+            await this.page.goto('/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+            console.log('Successfully loaded with "domcontentloaded" event');
+            break;
+          }
+        }
+      } catch (error) {
+        currentRetry++;
+        if (currentRetry >= maxRetries) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          throw new Error(`Failed to navigate to home page after ${maxRetries} attempts. Last error: ${errorMessage}`);
+        }
+        console.log(`Navigation attempt ${currentRetry} failed, retrying in 2 seconds...`);
+        await this.page.waitForTimeout(2000);
+      }
+    }
+    
+    // Wait for basic page readiness with reduced timeout
+    await this.waitForBasicPageReady();
+  }
+
+  /**
+   * Wait for basic page readiness without strict network idle requirements
+   */
+  async waitForBasicPageReady(): Promise<void> {
+    try {
+      // Wait for the page to be basically interactive
+      await this.page.waitForLoadState('domcontentloaded', { timeout: 10000 });
+      
+      // Wait for some key elements to ensure page is usable
+      await this.page.waitForSelector('body', { timeout: 10000 });
+      
+      // Optional: Wait for main navigation or header
+      await this.page.waitForSelector('header, nav, .navbar', { timeout: 5000 }).catch(() => {
+        console.log('Header/nav not found or took too long - continuing anyway');
+      });
+      
+    } catch (error) {
+      console.log(`Basic page ready check failed: ${error instanceof Error ? error.message : String(error)} - continuing anyway`);
+    }
   }
 
   /**

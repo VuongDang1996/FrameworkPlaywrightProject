@@ -270,6 +270,33 @@ const generateUserData = () => ({
 ```
 
 ## 🔍 Debugging Tests
+Run test case individuals : 
+npx playwright test --debug --grep "TC01 - Register User"
+npx playwright test --debug --grep "TC02 - Login User with Correct Email and Password"
+npx playwright test --debug --grep "TC03 - Login User with Incorrect Email and Password"
+npx playwright test --debug --grep "TC04 - Logout User"
+npx playwright test --debug --grep "TC05 - Register User with Existing Email"
+npx playwright test --debug --grep "TC06 - Contact Us Form"
+npx playwright test --debug --grep "TC07 - Verify Test Cases Page"
+npx playwright test --debug --grep "TC08 - Verify All Products and Product Detail Page"
+npx playwright test --debug --grep "TC09 - Search Product"
+npx playwright test --debug --grep "TC10 - Verify Subscription in Home Page"
+npx playwright test --debug --grep "TC11 - Verify Subscription in Cart Page"
+npx playwright test --debug --grep "TC12 - Add Products in Cart"
+npx playwright test --debug --grep "TC13 - Verify Product Quantity in Cart"
+npx playwright test --debug --grep "TC14 - Place Order: Register While Checkout"
+npx playwright test --debug --grep "TC15 - Place Order: Register Before Checkout"
+npx playwright test --debug --grep "TC16 - Place Order: Login Before Checkout"
+npx playwright test --debug --grep "TC17 - Remove Products From Cart"
+npx playwright test --debug --grep "TC18 - View Category Products"
+npx playwright test --debug --grep "TC19 - View & Cart Brand Products"
+npx playwright test --debug --grep "TC20 - Search Products and Verify Cart After Login"
+npx playwright test --debug --grep "TC21 - Add Review on Product"
+npx playwright test --debug --grep "TC22 - Add to Cart from Recommended Items"
+npx playwright test --debug --grep "TC23 - Verify Address Details in Checkout Page"
+npx playwright test --debug --grep "TC24 - Download Invoice After Purchase Order"
+npx playwright test --debug --grep "TC25 - Verify Scroll Up Using Arrow Button"
+npx playwright test --debug --grep "TC26 - Verify Scroll Up Without Arrow Button"
 
 ### 1. Visual Debugging
 

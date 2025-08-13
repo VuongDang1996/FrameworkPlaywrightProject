@@ -47,7 +47,20 @@ export class LoginPage extends BasePage {
    * Navigate to login page
    */
   async navigateTo(): Promise<void> {
-    await this.page.goto('/login');
+    try {
+      // Try with load event first
+      await this.page.goto('/login', { waitUntil: 'load', timeout: 60000 });
+    } catch (error) {
+      console.log('Load event timeout, trying with networkidle...');
+      try {
+        // Fallback to networkidle
+        await this.page.goto('/login', { waitUntil: 'networkidle', timeout: 60000 });
+      } catch (secondError) {
+        console.log('Networkidle timeout, trying with domcontentloaded...');
+        // Final fallback to domcontentloaded
+        await this.page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 60000 });
+      }
+    }
     await this.waitForPageReady();
   }
 

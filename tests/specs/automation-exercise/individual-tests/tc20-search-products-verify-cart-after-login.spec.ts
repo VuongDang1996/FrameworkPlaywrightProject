@@ -37,34 +37,48 @@ test.describe('TC20 - Search Products and Verify Cart After Login', () => {
       await expect(productsPage.allProductsTitle).toBeVisible();
     });
 
-    // 4. Enter product name in search input and click search button
-    await productsPage.searchProducts(SEARCH_TERMS.SHIRT);
+    await AllureHelpers.step('Search for products', async () => {
+      // 4. Enter product name in search input and click search button
+      await productsPage.searchProducts(SEARCH_TERMS.SHIRT);
+    });
 
-    // 5. Verify 'SEARCHED PRODUCTS' is visible
-    await expect(productsPage.searchedProductsTitle).toBeVisible();
+    await AllureHelpers.step('Verify search results are displayed', async () => {
+      // 5. Verify 'SEARCHED PRODUCTS' is visible
+      await expect(productsPage.searchedProductsTitle).toBeVisible();
 
-    // 6. Verify all the products related to search are visible
-    await expect(productsPage.searchResults.first()).toBeVisible();
+      // 6. Verify all the products related to search are visible
+      await expect(productsPage.searchResults.first()).toBeVisible();
+    });
 
-    // 7. Add those products to cart (limit to first 3 to avoid timeouts)
-    await productsPage.addSearchResultsToCart(3);
+    await AllureHelpers.step('Add search results to cart', async () => {
+      // 7. Add those products to cart (limit to first 3 to avoid timeouts)
+      await productsPage.addSearchResultsToCart(3);
+    });
 
-    // 8. Click 'Cart' button and verify that products are visible in cart
-    await homePage.clickCart();
-    await expect(cartPage.cartTable).toBeVisible();
-    const itemsBeforeLogin = await cartPage.getCartItemsCount();
-    expect(itemsBeforeLogin).toBeGreaterThan(0);
+    let itemsBeforeLogin: number;
 
-    // 9. Click 'Signup / Login' button and submit login details
-    await homePage.clickSignupLogin();
-    await loginPage.loginUser(TEST_USERS.VALID_USER.email, TEST_USERS.VALID_USER.password);
+    await AllureHelpers.step('Verify cart contains products before login', async () => {
+      // 8. Click 'Cart' button and verify that products are visible in cart
+      await homePage.clickCart();
+      await expect(cartPage.cartTable).toBeVisible();
+      itemsBeforeLogin = await cartPage.getCartItemsCount();
+      expect(itemsBeforeLogin).toBeGreaterThan(0);
+    });
 
-    // 10. Again, go to Cart page
-    await homePage.clickCart();
+    await AllureHelpers.step('Login with existing user', async () => {
+      // 9. Click 'Signup / Login' button and submit login details
+      await homePage.clickSignupLogin();
+      await loginPage.loginUser(TEST_USERS.VALID_USER.email, TEST_USERS.VALID_USER.password);
+    });
 
-    // 11. Verify that those products are visible in cart after login as well
-    await expect(cartPage.cartTable).toBeVisible();
-    const itemsAfterLogin = await cartPage.getCartItemsCount();
-    expect(itemsAfterLogin).toBeGreaterThanOrEqual(itemsBeforeLogin); // Cart should have at least the same items
+    await AllureHelpers.step('Verify cart items persist after login', async () => {
+      // 10. Again, go to Cart page
+      await homePage.clickCart();
+
+      // 11. Verify that those products are visible in cart after login as well
+      await expect(cartPage.cartTable).toBeVisible();
+      const itemsAfterLogin = await cartPage.getCartItemsCount();
+      expect(itemsAfterLogin).toBeGreaterThanOrEqual(itemsBeforeLogin); // Cart should have at least the same items
+    });
   });
 });
