@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@pages/*": ["tests/pages/*"],
+      "@components/*": ["tests/pages/components/*"],
+      "@fixtures/*": ["tests/fixtures/*"],
+      "@utils/*": ["tests/utils/*"],
+      "@data/*": ["tests/data/*"],
+      "@config/*": ["tests/config/*"],
+      "@interfaces/*": ["tests/interfaces/*"]
+    }
+  },
+  "include": [
+    "features/**/*",
+    "tests/**/*"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}

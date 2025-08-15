@@ -69,7 +69,7 @@ export default defineConfig({
     baseURL: process.env.BASE_URL || 'https://automationexercise.com',
     
     // Browser settings
-    headless: process.env.CI ? true : false,
+    headless: true, // Force headless mode
     viewport: { width: 1280, height: 720 },
     
     // Tracing and debugging
