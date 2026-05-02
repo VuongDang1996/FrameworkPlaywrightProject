@@ -265,3 +265,48 @@ test.describe('My Feature Name', () => {
 - [ ] Test name includes a tag (`@smoke` or `@regression`)
 - [ ] Produces a clear failure message when an assertion fails
 
+---
+
+## 🧠 Interactive Practice
+
+**Concept:** Playwright Fixtures
+Fixtures establish an environment for each test. In our framework, custom fixtures automatically instantiate Page Objects (like `homePage` or `loginPage`). This means you don't have to use the `new` keyword or `context.newPage()` manually, making your tests significantly cleaner!
+
+**Term:** @smoke vs @regression Tags
+These are tags appended to the title of a test block. They allow you to run a specific subset of tests using Playwright's command line grep option. For example, running `npx playwright test --grep "@smoke"` will only execute tests containing that tag.
+
+### Playwright TypeScript Basics
+- [ ] You should import `test` directly from `@playwright/test` when writing tests in this framework.
+- [ ] You must manually instantiate Page Objects using `const homePage = new HomePage(page)` in every test block.
+- [x] You should import `test` from the custom fixtures file (`@fixtures/automation-exercise-fixtures`) and inject Page Objects directly into the test parameters.
+- [ ] Allure metadata should only be added inside the `playwright.config.ts` file, never in the individual test files.
+
+### [Exercise] Write a Basic Navigation Test
+- **Difficulty:** Basic
+- **Description:** Let's practice writing a fundamental Playwright test using our framework. Import `test` from the custom fixtures, inject `homePage`, navigate to the home page, and assert that the features section is visible.
+
+```typescript
+import { expect } from '@playwright/test';
+// 1. Import test from the custom fixtures
+// YOUR CODE HERE
+
+// 2. Inject homePage into the test
+test('home page features are visible @smoke', async ({ /* YOUR CODE HERE */ }) => {
+  // 3. Navigate to the home page
+  // YOUR CODE HERE
+  
+  // 4. Assert that the features section (homePage.featuresItems) is visible
+  // YOUR CODE HERE
+});
+```
+
+### Solution
+```typescript
+import { expect } from '@playwright/test';
+import { test } from '@fixtures/automation-exercise-fixtures';
+
+test('home page features are visible @smoke', async ({ homePage }) => {
+  await homePage.navigateTo();
+  await expect(homePage.featuresItems).toBeVisible();
+});
+```

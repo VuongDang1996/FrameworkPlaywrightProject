@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Learning Lab</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" id="prism-theme" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+</head>
+<body>
+    <header class="app-header glass-panel">
+        <div class="logo">🚀 Learning Lab</div>
+        <div class="status-indicator">
+            <span class="status-dot online"></span>
+            <span id="system-status">System Online</span>
+        </div>
+        <button id="theme-toggle" class="theme-btn">☀️ Light Mode</button>
+    </header>
+
+    <main class="app-layout">
+        <!-- Dashboard Sidebar -->
+        <aside class="dashboard glass-panel">
+            <h2>📊 Dashboard</h2>
+            <div class="stat-group">
+                <h3>Flashcards Mastered</h3>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="flashcard-progress" style="width: 0%"></div></div>
+                <span id="flashcard-stat" class="stat-text">0 / 0</span>
+            </div>
+            <div class="stat-group">
+                <h3>Quiz Score</h3>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="quiz-progress" style="width: 0%"></div></div>
+                <span id="quiz-stat" class="stat-text">0%</span>
+            </div>
+            <div class="stat-group exercises-stat">
+                <h3>Coding Exercises</h3>
+                <ul class="exercise-stats-list">
+                    <li><span class="ex-label basic">Basic:</span> <span id="ex-basic">0/0</span></li>
+                    <li><span class="ex-label intermediate">Intermediate:</span> <span id="ex-intermediate">0/0</span></li>
+                    <li><span class="ex-label advanced">Advanced:</span> <span id="ex-advanced">0/0</span></li>
+                </ul>
+            </div>
+            <div class="dashboard-controls">
+                 <button id="reset-progress" class="action-btn danger">Reset Progress</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <section class="main-content">
+            <!-- Document Tabs -->
+            <div class="tabs-container glass-panel">
+                <div class="docs-tabs scrollable-tabs" id="docs-tabs">
+                    <!-- Dynamic Tabs will be injected here -->
+                </div>
+            </div>
+
+            <!-- Content Viewer -->
+            <div class="content-viewer glass-panel">
+                <div class="mode-switcher" id="mode-switcher">
+                    <button class="mode-btn active" data-mode="reading">Reading</button>
+                    <button class="mode-btn" data-mode="flashcards">Flashcards</button>
+                    <button class="mode-btn" data-mode="quizzes">Quizzes</button>
+                    <button class="mode-btn" data-mode="coding">Coding Exercises</button>
+                </div>
+
+                <div class="mode-content">
+                    <div id="reading-mode" class="mode-pane active markdown-body">
+                        <h2>Select a document to begin reading.</h2>
+                    </div>
+                    
+                    <div id="flashcards-mode" class="mode-pane">
+                        <div class="flashcards-grid" id="flashcards-container"></div>
+                    </div>
+                    
+                    <div id="quizzes-mode" class="mode-pane">
+                        <div class="quizzes-list" id="quizzes-container"></div>
+                    </div>
+                    
+                    <div id="coding-mode" class="mode-pane">
+                        <div class="exercises-list" id="exercises-container"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Main Module -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
