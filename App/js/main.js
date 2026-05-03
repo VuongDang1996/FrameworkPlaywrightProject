@@ -218,6 +218,13 @@ class App {
 
         const doc = this.documents[this.currentDocId];
         const element = document.getElementById('reading-mode');
+        
+        // Temporarily render the FULL document (including flashcards/quizzes) for the PDF
+        const originalContent = element.innerHTML;
+        element.innerHTML = marked.parse(doc.text);
+        if (window.Prism) {
+            window.Prism.highlightAllUnder(element);
+        }
 
         const opt = {
             margin: [15, 10],
@@ -229,29 +236,25 @@ class App {
                 letterRendering: true, 
                 scrollY: 0,
                 onclone: (clonedDoc) => {
-                    // Force light mode CSS variables
                     clonedDoc.documentElement.setAttribute('data-theme', 'light');
                     
-                    // Inject explicit CSS to override any leftover dark-mode/Prism colors
-                    // CRITICAL: Disable all animations! html2canvas restarts the fadeIn animation
-                    // on the cloned DOM, which causes it to capture the text at 0.1 opacity!
                     const style = clonedDoc.createElement('style');
                     style.innerHTML = `
                         * {
                             animation: none !important;
                             transition: none !important;
                         }
-                        /* Force all markdown text to black for the PDF */
+                        #reading-mode {
+                            display: block !important;
+                        }
                         #reading-mode, #reading-mode * {
                             color: #000000 !important;
                             text-shadow: none !important;
                         }
-                        /* Force code blocks to a light gray background */
                         #reading-mode pre, #reading-mode code {
                             background-color: #f3f4f6 !important;
                             border-color: #e5e7eb !important;
                         }
-                        /* Restore some basic syntax colors for readability */
                         #reading-mode .token.keyword { color: #0000ff !important; }
                         #reading-mode .token.string { color: #a31515 !important; }
                         #reading-mode .token.comment { color: #008000 !important; }
@@ -280,6 +283,7 @@ class App {
 
         // ---------- Export ----------
         const cleanup = () => {
+            element.innerHTML = originalContent;
             btn.innerHTML = originalText;
             btn.disabled = false;
         };
