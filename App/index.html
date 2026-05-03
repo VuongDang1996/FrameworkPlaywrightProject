@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universal Learning Lab</title>
+    <script>
+        // Force trailing slash for correct relative path resolution
+        if (window.location.pathname.endsWith('/App')) {
+            window.location.pathname += '/';
+        }
+    </script>
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -99,6 +105,12 @@
                     </div>
                     
                     <div id="coding-mode" class="mode-pane">
+                        <div class="exercise-filters">
+                            <button class="filter-btn active" data-difficulty="all">All</button>
+                            <button class="filter-btn" data-difficulty="basic">Basic</button>
+                            <button class="filter-btn" data-difficulty="intermediate">Intermediate</button>
+                            <button class="filter-btn" data-difficulty="advanced">Advanced</button>
+                        </div>
                         <div class="exercises-list" id="exercises-container"></div>
                     </div>
                 </div>
