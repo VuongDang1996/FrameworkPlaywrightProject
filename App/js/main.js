@@ -229,42 +229,49 @@ class App {
                 letterRendering: true, 
                 scrollY: 0,
                 onclone: (clonedDoc) => {
-                    // This callback fires on the hidden cloned document before rendering.
-                    // We apply print-friendly styles here to avoid UI flicker and transition bugs.
-                    const clonedElement = clonedDoc.getElementById('reading-mode');
+                    // Force light mode CSS variables
+                    clonedDoc.documentElement.setAttribute('data-theme', 'light');
                     
-                    // 1. Force background and text colors
-                    clonedDoc.body.style.background = '#ffffff';
-                    clonedElement.style.color = '#111827';
-                    
-                    // 2. Add header to the clone
-                    const header = clonedDoc.createElement('div');
-                    header.style.borderBottom = '2px solid #6366f1';
-                    header.style.paddingBottom = '10px';
-                    header.style.marginBottom = '30px';
-                    header.innerHTML = `
-                        <h1 style="color:#6366f1; margin:0; font-size: 24pt;">${doc.title}</h1>
-                        <p style="color:#6b7280; margin:5px 0 0 0; font-size: 10pt;">Playwright Interactive Learning Lab • Study Guide</p>
-                    `;
-                    clonedElement.prepend(header);
-
-                    // 3. Force dark text on all children
-                    clonedElement.querySelectorAll('*').forEach(el => {
-                        el.style.color = '#111827';
-                        // Force code blocks to have a light background
-                        if (el.tagName === 'PRE' || el.tagName === 'CODE') {
-                            el.style.backgroundColor = '#f3f4f6';
-                            el.style.textShadow = 'none'; // Remove prism dark mode text shadows
+                    // Inject explicit CSS to override any leftover dark-mode/Prism colors
+                    // CRITICAL: Disable all animations! html2canvas restarts the fadeIn animation
+                    // on the cloned DOM, which causes it to capture the text at 0.1 opacity!
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        * {
+                            animation: none !important;
+                            transition: none !important;
                         }
-                    });
+                        /* Force all markdown text to black for the PDF */
+                        #reading-mode, #reading-mode * {
+                            color: #000000 !important;
+                            text-shadow: none !important;
+                        }
+                        /* Force code blocks to a light gray background */
+                        #reading-mode pre, #reading-mode code {
+                            background-color: #f3f4f6 !important;
+                            border-color: #e5e7eb !important;
+                        }
+                        /* Restore some basic syntax colors for readability */
+                        #reading-mode .token.keyword { color: #0000ff !important; }
+                        #reading-mode .token.string { color: #a31515 !important; }
+                        #reading-mode .token.comment { color: #008000 !important; }
+                        #reading-mode .token.function { color: #795e26 !important; }
+                        #reading-mode .token.class-name { color: #267f99 !important; }
+                    `;
+                    clonedDoc.head.appendChild(style);
                     
-                    // Specific prism token overrides (otherwise they stay bright neon)
-                    clonedElement.querySelectorAll('.token').forEach(el => {
-                        if (el.classList.contains('keyword')) el.style.color = '#0000ff';
-                        else if (el.classList.contains('string')) el.style.color = '#a31515';
-                        else if (el.classList.contains('comment')) el.style.color = '#008000';
-                        else el.style.color = '#111827';
-                    });
+                    const clonedElement = clonedDoc.getElementById('reading-mode');
+                    if (clonedElement) {
+                        const header = clonedDoc.createElement('div');
+                        header.style.borderBottom = '2px solid #6366f1';
+                        header.style.paddingBottom = '10px';
+                        header.style.marginBottom = '30px';
+                        header.innerHTML = `
+                            <h1 style="color:#6366f1 !important; margin:0; font-size: 24pt;">${doc.title}</h1>
+                            <p style="color:#6b7280 !important; margin:5px 0 0 0; font-size: 10pt;">Playwright Interactive Learning Lab • Study Guide</p>
+                        `;
+                        clonedElement.prepend(header);
+                    }
                 }
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
