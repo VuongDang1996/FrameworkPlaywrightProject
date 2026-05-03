@@ -36,6 +36,7 @@ class App {
         this.renderer = new Renderer();
         this.documents = {};
         this.currentDocId = null;
+        this.currentFilter = 'all';
 
         this.initTheme();
         this.initMonaco();
@@ -101,6 +102,22 @@ class App {
                 }
             }
         });
+
+        // Exercise filters
+        const filterContainer = document.querySelector('.exercise-filters');
+        if (filterContainer) {
+            filterContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.currentFilter = e.target.getAttribute('data-difficulty');
+                    
+                    if (this.currentDocId) {
+                        this.renderExercisesOnly();
+                    }
+                }
+            });
+        }
 
         // Progress updates
         document.addEventListener('progress-updated', () => this.updateDashboard());
@@ -179,9 +196,10 @@ class App {
         this.currentDocId = docId;
         const doc = this.documents[docId];
 
-        // 1. Reading Mode
-        const readingContainer = document.getElementById('reading-mode');
-        readingContainer.innerHTML = marked.parse(doc.text);
+        // 1. Reading Mode - Extract only the portion before the first "---" 
+        // to hide the interactive sections from the reading view.
+        const readingContent = doc.text.split(/^-{3,}$/m)[0] || doc.text;
+        readingContainer.innerHTML = marked.parse(readingContent);
         Prism.highlightAllUnder(readingContainer);
 
         // 2. Flashcards
@@ -191,7 +209,19 @@ class App {
         this.renderer.renderQuizzes(doc.data.quizzes, document.getElementById('quizzes-container'));
 
         // 4. Exercises
-        this.renderer.renderExercises(doc.data.exercises, document.getElementById('exercises-container'));
+        this.renderExercisesOnly();
+    }
+
+    renderExercisesOnly() {
+        const doc = this.documents[this.currentDocId];
+        if (!doc) return;
+
+        let filtered = doc.data.exercises;
+        if (this.currentFilter !== 'all') {
+            filtered = doc.data.exercises.filter(ex => ex.difficulty.toLowerCase() === this.currentFilter);
+        }
+
+        this.renderer.renderExercises(filtered, document.getElementById('exercises-container'));
     }
 
     updateDashboard() {
