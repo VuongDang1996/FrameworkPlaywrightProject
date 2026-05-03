@@ -269,7 +269,6 @@ class App {
             cleanup();
         });
     }
-    }
 
     async loadDocuments() {
         const tabsContainer = document.getElementById('docs-tabs');
