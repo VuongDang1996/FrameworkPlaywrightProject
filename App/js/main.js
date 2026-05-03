@@ -219,11 +219,26 @@ class App {
         const doc = this.documents[this.currentDocId];
         const element = document.getElementById('reading-mode');
         
-        // Temporarily render the FULL document (including flashcards/quizzes) for the PDF
+        // Filter out Coding Exercises from the PDF (they make the document way too long for print)
+        let exportContent = doc.text;
+        const codingMatch = exportContent.match(/^## 🏋️ Coding Exercises/m);
+        if (codingMatch) {
+            exportContent = exportContent.substring(0, codingMatch.index);
+        }
+
+        // Temporarily render the filtered document for the PDF
         const originalContent = element.innerHTML;
-        element.innerHTML = marked.parse(doc.text);
+        element.innerHTML = marked.parse(exportContent);
         if (window.Prism) {
             window.Prism.highlightAllUnder(element);
+        }
+
+        // Browsers have a hard limit of ~32,767px for canvas height.
+        // We dynamically calculate a safe scale to prevent html2canvas from crashing.
+        let safeScale = 2;
+        const maxCanvasHeight = 30000;
+        if (element.scrollHeight * safeScale > maxCanvasHeight) {
+            safeScale = Math.max(0.5, maxCanvasHeight / element.scrollHeight);
         }
 
         const opt = {
@@ -231,7 +246,7 @@ class App {
             filename: `${doc.title.replace(/\s+/g, '_')}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
-                scale: 2, 
+                scale: safeScale, 
                 useCORS: true, 
                 letterRendering: true, 
                 scrollY: 0,
