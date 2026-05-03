@@ -56,7 +56,7 @@ class App {
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('learning_lab_theme', newTheme);
             this.updateThemeUI(newTheme, toggle);
-            
+
             // Update Monaco theme if loaded
             if (window.monaco) {
                 window.monaco.editor.setTheme(newTheme === 'dark' ? 'vs-dark' : 'vs');
@@ -65,7 +65,7 @@ class App {
     }
 
     updateThemeUI(theme, btn) {
-        if(theme === 'dark') {
+        if (theme === 'dark') {
             btn.textContent = '☀️ Light Mode';
             document.getElementById('prism-theme').href = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css";
         } else {
@@ -75,7 +75,7 @@ class App {
     }
 
     initMonaco() {
-        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
         require(['vs/editor/editor.main'], () => {
             window.monacoLoaded = true;
             document.dispatchEvent(new Event('monaco-loaded'));
@@ -111,7 +111,7 @@ class App {
                     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
                     this.currentFilter = e.target.getAttribute('data-difficulty');
-                    
+
                     if (this.currentDocId) {
                         this.renderExercisesOnly();
                     }
@@ -126,13 +126,13 @@ class App {
         const resetBtn = document.getElementById('reset-progress');
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
-                if(confirm("Are you sure you want to reset all progress?")) {
+                if (confirm("Are you sure you want to reset all progress?")) {
                     localStorage.removeItem('learning_lab_srs');
                     localStorage.removeItem('learning_lab_quiz');
                     localStorage.removeItem('learning_lab_code');
                     localStorage.removeItem('learning_lab_solved');
                     this.updateDashboard();
-                    if(this.currentDocId) {
+                    if (this.currentDocId) {
                         this.renderDocument(this.currentDocId);
                     }
                 }
@@ -146,43 +146,108 @@ class App {
         }
     }
 
-    exportToPDF() {
-        // Check if library is available
-        if (typeof html2pdf === 'undefined') {
-            console.warn('html2pdf not found, attempting to load dynamically...');
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-            script.onload = () => this.exportToPDF();
-            script.onerror = () => alert('Failed to load PDF library. Please check your internet connection.');
-            document.head.appendChild(script);
-            return;
+    /**
+     * Resolves the html2pdf library, handling both the global and AMD
+     * (RequireJS, from Monaco Editor) module cases.
+     * @returns {Promise<Function>}
+     */
+    async resolveHtml2pdf() {
+        // 1) Already a global function – use it
+        if (typeof html2pdf === 'function') return html2pdf;
+
+        // 2) Loaded as an AMD module via RequireJS (Monaco loads RequireJS before
+        //    html2pdf.js, so the UMD bundle registers as an AMD module instead of
+        //    setting window.html2pdf).
+        if (window.require) {
+            try {
+                const mod = await new Promise((resolve, reject) => {
+                    window.require(['html2pdf'], resolve, reject);
+                });
+                // Cache on window for subsequent calls
+                window.html2pdf = mod;
+                return mod;
+            } catch {
+                // Module not registered with require – fall through to dynamic load
+            }
         }
 
+        // 3) Dynamic load – also nukes AMD detection so the bundle sets the global
+        return new Promise((resolve, reject) => {
+            const savedDefine = window.define;
+            window.define = undefined;
+
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = () => {
+                window.define = savedDefine;
+                if (typeof html2pdf === 'function') {
+                    resolve(html2pdf);
+                } else {
+                    reject(new Error('html2pdf loaded but not available as a function'));
+                }
+            };
+            script.onerror = () => {
+                window.define = savedDefine;
+                reject(new Error('Failed to load html2pdf library from CDN'));
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    async exportToPDF() {
         if (!this.currentDocId) {
             alert('Please select a document first.');
             return;
         }
 
+        const btn = document.getElementById('export-pdf');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ Generating...';
+        btn.disabled = true;
+
+        let html2pdfLib;
+        try {
+            html2pdfLib = await this.resolveHtml2pdf();
+        } catch (err) {
+            console.error('PDF Export Error:', err);
+            alert('Failed to load PDF library. Please check your internet connection.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+
         const doc = this.documents[this.currentDocId];
         const element = document.getElementById('reading-mode');
-        
-        // Configuration for html2pdf
+
         const opt = {
-            margin:       [15, 10],
-            filename:     `${doc.title.replace(/\s+/g, '_')}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            margin: [15, 10],
+            filename: `${doc.title.replace(/\s+/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
-        // Create a temporary container for the PDF content to style it for printing
-        const tempContainer = document.createElement('div');
-        tempContainer.style.padding = '20px';
-        tempContainer.style.color = '#1f2937';
-        tempContainer.style.backgroundColor = '#ffffff';
+        // ---------- Build a print-styled container ----------
+        const printBox = document.createElement('div');
+        printBox.style.padding = '20px';
+        printBox.style.backgroundColor = '#ffffff';
+        printBox.style.fontFamily = 'Inter, sans-serif';
+        printBox.style.lineHeight = '1.6';
+        printBox.style.fontSize = '11pt';
 
-        // Add a professional header
+        // CRITICAL: Must be in-viewport for html2canvas to render it.
+        // Use position:absolute with negative z-index so it renders fully opaque
+        // to html2canvas but stays hidden behind the main UI.
+        printBox.style.position = 'absolute';
+        printBox.style.top = '0';
+        printBox.style.left = '0';
+        printBox.style.width = '794px';          // A4 width at 96dpi (~210mm)
+        printBox.style.zIndex = '-1000';
+        printBox.style.pointerEvents = 'none';    // don't block user interaction
+
+
+        // --- Header ---
         const header = document.createElement('div');
         header.style.borderBottom = '2px solid #6366f1';
         header.style.paddingBottom = '10px';
@@ -191,26 +256,41 @@ class App {
             <h1 style="color:#6366f1; margin:0; font-size: 24pt;">${doc.title}</h1>
             <p style="color:#6b7280; margin:5px 0 0 0; font-size: 10pt;">Playwright Interactive Learning Lab • Study Guide</p>
         `;
-        tempContainer.appendChild(header);
+        printBox.appendChild(header);
 
-        // Clone the content
+        // --- Cloned content with print-friendly overrides ---
         const contentClone = element.cloneNode(true);
-        
-        // Fix styles for PDF (ensure dark text, clear code blocks)
         contentClone.style.color = '#111827';
-        contentClone.querySelectorAll('*').forEach(el => {
+        contentClone.style.padding = '0';
+        contentClone.style.margin = '0';
+
+        contentClone.querySelectorAll('pre').forEach(el => {
+            el.style.backgroundColor = '#f8f9fa';
+            el.style.border = '1px solid #e5e7eb';
+            el.style.borderRadius = '6px';
+            el.style.padding = '16px';
+            el.style.overflow = 'hidden';
+            el.style.margin = '16px 0';
+        });
+        contentClone.querySelectorAll('code').forEach(el => {
+            el.style.backgroundColor = 'transparent';
+            el.style.border = 'none';
+            el.style.borderRadius = '0';
+            el.style.padding = '0';
+        });
+        contentClone.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(el => {
             el.style.color = '#111827';
         });
-        contentClone.querySelectorAll('pre, code').forEach(el => {
-            el.style.backgroundColor = '#f3f4f6';
-            el.style.border = '1px solid #e5e7eb';
+        contentClone.querySelectorAll('p, li, blockquote, td, th').forEach(el => {
             el.style.color = '#1f2937';
-            el.style.borderRadius = '4px';
+        });
+        contentClone.querySelectorAll('a').forEach(el => {
+            el.style.color = '#6366f1';
         });
 
-        tempContainer.appendChild(contentClone);
+        printBox.appendChild(contentClone);
 
-        // Add a footer
+        // --- Footer ---
         const footer = document.createElement('div');
         footer.style.marginTop = '40px';
         footer.style.borderTop = '1px solid #e5e7eb';
@@ -219,22 +299,28 @@ class App {
         footer.style.color = '#9ca3af';
         footer.style.fontSize = '8pt';
         footer.innerHTML = `Generated by Playwright Learning Lab on ${new Date().toLocaleDateString()}`;
-        tempContainer.appendChild(footer);
+        printBox.appendChild(footer);
 
-        // Run export
-        const btn = document.getElementById('export-pdf');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '⏳ Generating...';
-        btn.disabled = true;
-
-        html2pdf().set(opt).from(tempContainer).save().then(() => {
+        // ---------- Export ----------
+        const cleanup = () => {
+            if (printBox.parentNode) {
+                printBox.parentNode.removeChild(printBox);
+            }
             btn.innerHTML = originalText;
             btn.disabled = false;
+        };
+
+        document.body.appendChild(printBox);
+
+        // Wait for the next paint frame so the browser fully lays out printBox
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        html2pdfLib().set(opt).from(printBox).save().then(() => {
+            cleanup();
         }).catch(err => {
             console.error('PDF Export Error:', err);
             alert('Failed to generate PDF. Please try again.');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+            cleanup();
         });
     }
 
@@ -245,12 +331,12 @@ class App {
         for (let i = 0; i < MARKDOWN_FILES.length; i++) {
             const file = MARKDOWN_FILES[i];
             const id = `doc_${i}`;
-            
+
             try {
                 const response = await fetch(file.url);
                 if (!response.ok) throw new Error(`HTTP error ${response.status}`);
                 const text = await response.text();
-                
+
                 const parsedData = this.parser.parse(text);
                 this.documents[id] = {
                     title: file.title,
@@ -277,7 +363,7 @@ class App {
                 console.error(`Failed to load ${file.url}:`, err);
             }
         }
-        
+
         if (Object.keys(this.documents).length === 0) {
             document.getElementById('reading-mode').innerHTML = `
                 <div style="color:var(--error-color)">
@@ -298,12 +384,12 @@ class App {
         // We look for the first occurrence of an interactive section header.
         const readingContainer = document.getElementById('reading-mode');
         const interactiveHeaderMatch = doc.text.match(/^## (?:🧠 Flashcards|📝 Quizzes|🏋️ Coding Exercises)/m);
-        
+
         let readingContent = doc.text;
         if (interactiveHeaderMatch) {
             readingContent = doc.text.substring(0, interactiveHeaderMatch.index);
         }
-        
+
         readingContainer.innerHTML = marked.parse(readingContent);
         Prism.highlightAllUnder(readingContainer);
 
@@ -338,11 +424,11 @@ class App {
         let totalCards = 0;
         Object.values(this.documents).forEach(d => totalCards += d.data.flashcards.length);
         const masteredCards = Object.values(srsProgress).filter(score => score === 2).length;
-        
+
         const fcStat = document.getElementById('flashcard-stat');
         const fcProg = document.getElementById('flashcard-progress');
         if (fcStat) fcStat.textContent = `${masteredCards} / ${totalCards}`;
-        if (fcProg) fcProg.style.width = totalCards > 0 ? `${(masteredCards/totalCards)*100}%` : '0%';
+        if (fcProg) fcProg.style.width = totalCards > 0 ? `${(masteredCards / totalCards) * 100}%` : '0%';
 
         // Quizzes
         let totalQuizzes = 0;
@@ -350,7 +436,7 @@ class App {
         Object.values(this.documents).forEach(doc => {
             totalQuizzes += doc.data.quizzes.length;
             doc.data.quizzes.forEach(q => {
-                if(quizProgress[q.id] !== undefined) {
+                if (quizProgress[q.id] !== undefined) {
                     if (q.options[quizProgress[q.id]].isCorrect) {
                         correctQuizzes++;
                     }
@@ -358,11 +444,11 @@ class App {
             });
         });
 
-        const quizScore = totalQuizzes > 0 ? Math.round((correctQuizzes/totalQuizzes)*100) : 0;
+        const quizScore = totalQuizzes > 0 ? Math.round((correctQuizzes / totalQuizzes) * 100) : 0;
         const qzStat = document.getElementById('quiz-stat');
         const qzProg = document.getElementById('quiz-progress');
-        if(qzStat) qzStat.textContent = `${quizScore}%`;
-        if(qzProg) qzProg.style.width = `${quizScore}%`;
+        if (qzStat) qzStat.textContent = `${quizScore}%`;
+        if (qzProg) qzProg.style.width = `${quizScore}%`;
 
         // Exercises
         let basicTotal = 0, interTotal = 0, advTotal = 0;
@@ -387,9 +473,9 @@ class App {
         const exInter = document.getElementById('ex-intermediate');
         const exAdv = document.getElementById('ex-advanced');
 
-        if(exBasic) exBasic.textContent = `${basicSolved}/${basicTotal}`;
-        if(exInter) exInter.textContent = `${interSolved}/${interTotal}`;
-        if(exAdv) exAdv.textContent = `${advSolved}/${advTotal}`;
+        if (exBasic) exBasic.textContent = `${basicSolved}/${basicTotal}`;
+        if (exInter) exInter.textContent = `${interSolved}/${interTotal}`;
+        if (exAdv) exAdv.textContent = `${advSolved}/${advTotal}`;
     }
 }
 
