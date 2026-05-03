@@ -198,6 +198,7 @@ class App {
 
         // 1. Reading Mode - Extract only the portion before the first "---" 
         // to hide the interactive sections from the reading view.
+        const readingContainer = document.getElementById('reading-mode');
         const readingContent = doc.text.split(/^-{3,}$/m)[0] || doc.text;
         readingContainer.innerHTML = marked.parse(readingContent);
         Prism.highlightAllUnder(readingContainer);
