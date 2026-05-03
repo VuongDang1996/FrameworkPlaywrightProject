@@ -1,7 +1,7 @@
 # Playwright Interactive Learning Lab - Startup Script
 
 Write-Host ""
-Write-Host "==============================================" -ForegroundColor Magentat
+Write-Host "==============================================" -ForegroundColor Magenta
 Write-Host "   🎭 Playwright Interactive Learning Lab    " -ForegroundColor Cyan -BackgroundColor DarkBlue
 Write-Host "==============================================" -ForegroundColor Magenta
 Write-Host ""
@@ -18,8 +18,8 @@ if (!(Get-Command npx -ErrorAction SilentlyContinue)) {
 
 # Open the browser in a separate thread so it doesn't wait for the server to finish
 Start-Sleep -Seconds 2
-Write-Host "🔗 Opening Lab at http://localhost:8080/App/index.html" -ForegroundColor Yellow
-Start-Process "http://localhost:8080/App/index.html"
+Write-Host "🔗 Opening Lab at http://localhost:8080/App/" -ForegroundColor Yellow
+Start-Process "http://localhost:8080/App/"
 
 # Run the server
 npx serve . -l 8080
