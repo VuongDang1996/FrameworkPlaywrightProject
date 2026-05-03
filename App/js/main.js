@@ -196,10 +196,16 @@ class App {
         this.currentDocId = docId;
         const doc = this.documents[docId];
 
-        // 1. Reading Mode - Extract only the portion before the first "---" 
-        // to hide the interactive sections from the reading view.
+        // 1. Reading Mode - Extract only the teaching content.
+        // We look for the first occurrence of an interactive section header.
         const readingContainer = document.getElementById('reading-mode');
-        const readingContent = doc.text.split(/^-{3,}$/m)[0] || doc.text;
+        const interactiveHeaderMatch = doc.text.match(/^## (?:🧠 Flashcards|📝 Quizzes|🏋️ Coding Exercises)/m);
+        
+        let readingContent = doc.text;
+        if (interactiveHeaderMatch) {
+            readingContent = doc.text.substring(0, interactiveHeaderMatch.index);
+        }
+        
         readingContainer.innerHTML = marked.parse(readingContent);
         Prism.highlightAllUnder(readingContainer);
 
