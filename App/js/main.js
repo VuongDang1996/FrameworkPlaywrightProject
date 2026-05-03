@@ -223,43 +223,59 @@ class App {
             margin: [15, 10],
             filename: `${doc.title.replace(/\s+/g, '_')}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true, 
+                letterRendering: true, 
+                scrollY: 0,
+                onclone: (clonedDoc) => {
+                    // This callback fires on the hidden cloned document before rendering.
+                    // We apply print-friendly styles here to avoid UI flicker and transition bugs.
+                    const clonedElement = clonedDoc.getElementById('reading-mode');
+                    
+                    // 1. Force background and text colors
+                    clonedDoc.body.style.background = '#ffffff';
+                    clonedElement.style.color = '#111827';
+                    
+                    // 2. Add header to the clone
+                    const header = clonedDoc.createElement('div');
+                    header.style.borderBottom = '2px solid #6366f1';
+                    header.style.paddingBottom = '10px';
+                    header.style.marginBottom = '30px';
+                    header.innerHTML = `
+                        <h1 style="color:#6366f1; margin:0; font-size: 24pt;">${doc.title}</h1>
+                        <p style="color:#6b7280; margin:5px 0 0 0; font-size: 10pt;">Playwright Interactive Learning Lab • Study Guide</p>
+                    `;
+                    clonedElement.prepend(header);
+
+                    // 3. Force dark text on all children
+                    clonedElement.querySelectorAll('*').forEach(el => {
+                        el.style.color = '#111827';
+                        // Force code blocks to have a light background
+                        if (el.tagName === 'PRE' || el.tagName === 'CODE') {
+                            el.style.backgroundColor = '#f3f4f6';
+                            el.style.textShadow = 'none'; // Remove prism dark mode text shadows
+                        }
+                    });
+                    
+                    // Specific prism token overrides (otherwise they stay bright neon)
+                    clonedElement.querySelectorAll('.token').forEach(el => {
+                        if (el.classList.contains('keyword')) el.style.color = '#0000ff';
+                        else if (el.classList.contains('string')) el.style.color = '#a31515';
+                        else if (el.classList.contains('comment')) el.style.color = '#008000';
+                        else el.style.color = '#111827';
+                    });
+                }
+            },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak: { mode: ['css', 'legacy'], avoid: ['pre', 'code', 'h1', 'h2', 'h3'] }
         };
 
-        // --- Temporarily apply print styles directly to the live document ---
-        
-        // 1. Force light mode for printing
-        const originalTheme = document.documentElement.getAttribute('data-theme');
-        document.documentElement.setAttribute('data-theme', 'light');
-
-        // 2. Add header
-        const header = document.createElement('div');
-        header.id = 'temp-pdf-header';
-        header.style.borderBottom = '2px solid #6366f1';
-        header.style.paddingBottom = '10px';
-        header.style.marginBottom = '30px';
-        header.innerHTML = `
-            <h1 style="color:#6366f1; margin:0; font-size: 24pt;">${doc.title}</h1>
-            <p style="color:#6b7280; margin:5px 0 0 0; font-size: 10pt;">Playwright Interactive Learning Lab • Study Guide</p>
-        `;
-        element.prepend(header);
-
         // ---------- Export ----------
         const cleanup = () => {
-            // Restore theme
-            document.documentElement.setAttribute('data-theme', originalTheme);
-            // Remove header
-            const h = document.getElementById('temp-pdf-header');
-            if (h) h.parentNode.removeChild(h);
-            
             btn.innerHTML = originalText;
             btn.disabled = false;
         };
-
-        // Wait a frame for styles to apply
-        await new Promise(resolve => requestAnimationFrame(resolve));
 
         html2pdfLib().set(opt).from(element).save().then(() => {
             cleanup();
