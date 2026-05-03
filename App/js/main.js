@@ -147,6 +147,17 @@ class App {
     }
 
     exportToPDF() {
+        // Check if library is available
+        if (typeof html2pdf === 'undefined') {
+            console.warn('html2pdf not found, attempting to load dynamically...');
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = () => this.exportToPDF();
+            script.onerror = () => alert('Failed to load PDF library. Please check your internet connection.');
+            document.head.appendChild(script);
+            return;
+        }
+
         if (!this.currentDocId) {
             alert('Please select a document first.');
             return;
