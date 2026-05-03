@@ -218,17 +218,10 @@ class App {
 
         const doc = this.documents[this.currentDocId];
         const element = document.getElementById('reading-mode');
-        
-        // Filter out Coding Exercises from the PDF (they make the document way too long for print)
-        let exportContent = doc.text;
-        const codingMatch = exportContent.match(/^## 🏋️ Coding Exercises/m);
-        if (codingMatch) {
-            exportContent = exportContent.substring(0, codingMatch.index);
-        }
 
-        // Temporarily render the filtered document for the PDF
+        // Temporarily render the FULL document for the PDF
         const originalContent = element.innerHTML;
-        element.innerHTML = marked.parse(exportContent);
+        element.innerHTML = marked.parse(doc.text);
         if (window.Prism) {
             window.Prism.highlightAllUnder(element);
         }
@@ -237,6 +230,9 @@ class App {
         // We dynamically calculate a safe scale to prevent html2canvas from crashing.
         let safeScale = 2;
         const maxCanvasHeight = 30000;
+        // Wait a tick for the DOM to update scrollHeight accurately
+        await new Promise(r => setTimeout(r, 0));
+        
         if (element.scrollHeight * safeScale > maxCanvasHeight) {
             safeScale = Math.max(0.5, maxCanvasHeight / element.scrollHeight);
         }
