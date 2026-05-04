@@ -25,7 +25,8 @@ export class MarkdownParser {
         return {
             flashcards: this.extractFlashcards(markdownText, docHash),
             quizzes:    this.extractQuizzes(markdownText, docHash),
-            exercises:  this.extractExercises(markdownText, docHash)
+            exercises:  this.extractExercises(markdownText, docHash),
+            locators:   this.extractLocatorExercises(markdownText, docHash)
         };
     }
 
@@ -134,6 +135,50 @@ export class MarkdownParser {
                 lang,
                 setupCode,
                 solutionCode: solutionCode || setupCode
+            });
+        }
+        return exercises;
+    }
+
+    extractLocatorExercises(text, docHash = 'xx') {
+        const exercises = [];
+        const regex = /###\s+\[Locator Exercise\]\s+(.*?)\r?\n([\s\S]*?)(?=\r?\n###\s+\[Locator Exercise\]|$)/g;
+        let match;
+        let idCounter = 1;
+
+        while ((match = regex.exec(text)) !== null) {
+            const title = match[1].trim();
+            const body = match[2];
+
+            const diffMatch = /\*\*Difficulty:\*\*\s*(Basic|Intermediate|Advanced)/i.exec(body);
+            const difficulty = diffMatch ? diffMatch[1] : 'Basic';
+
+            const descMatch = /\*\*Description:\*\*\s*(.*?)\r?\n/i.exec(body);
+            const description = descMatch ? descMatch[1].trim() : '';
+
+            // Extract Target HTML
+            const htmlMatch = /\*\*Target HTML:\*\*\r?\n```html\r?\n([\s\S]*?)```/i.exec(body);
+            const targetHtml = htmlMatch ? htmlMatch[1].trim() : '';
+
+            // Extract Expected Locators
+            const locatorMatch = /\*\*Expected Locators?:\*\*\r?\n((?:- `.*`\r?\n?)+|`.*`)/i.exec(body);
+            let expectedLocators = [];
+            if (locatorMatch) {
+                const locatorsBlock = locatorMatch[1];
+                const locRegex = /`(.*?)`/g;
+                let locMatch;
+                while ((locMatch = locRegex.exec(locatorsBlock)) !== null) {
+                    expectedLocators.push(locMatch[1].trim());
+                }
+            }
+
+            exercises.push({
+                id: `loc_${docHash}_${idCounter++}`,
+                title,
+                difficulty,
+                description,
+                targetHtml,
+                expectedLocators
             });
         }
         return exercises;

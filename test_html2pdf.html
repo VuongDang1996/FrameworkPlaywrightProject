@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <button onclick="run()">Export</button>
+    <script>
+        function run() {
+            const printBox = document.createElement('div');
+            printBox.style.position = 'absolute';
+            printBox.style.top = '0';
+            printBox.style.left = '0';
+            printBox.style.width = '794px';
+            printBox.style.zIndex = '-1000';
+            printBox.innerHTML = '<h1>Hello World</h1><p>Test</p>';
+            document.body.appendChild(printBox);
+            
+            html2pdf().from(printBox).save().then(() => {
+                document.body.removeChild(printBox);
+            });
+        }
+    </script>
+</body>
+</html>

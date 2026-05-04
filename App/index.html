@@ -74,6 +74,11 @@
                     <li><span class="ex-label advanced">Advanced:</span> <span id="ex-advanced">0/0</span></li>
                 </ul>
             </div>
+            <div class="stat-group locator-stat">
+                <h3>Locator Mastery</h3>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="locator-progress" style="width: 0%"></div></div>
+                <span id="locator-stat" class="stat-text">0 / 0</span>
+            </div>
             <div class="dashboard-controls">
                  <button id="reset-progress" class="action-btn danger">Reset Progress</button>
             </div>
@@ -95,6 +100,7 @@
                     <button class="mode-btn" data-mode="flashcards">Flashcards</button>
                     <button class="mode-btn" data-mode="quizzes">Quizzes</button>
                     <button class="mode-btn" data-mode="coding">Coding Exercises</button>
+                    <button class="mode-btn" data-mode="locator">Locator Practice</button>
                 </div>
 
                 <div class="mode-content">
@@ -118,6 +124,21 @@
                             <button class="filter-btn" data-difficulty="advanced">Advanced</button>
                         </div>
                         <div class="exercises-list" id="exercises-container"></div>
+                    </div>
+
+                    <div id="locator-mode" class="mode-pane">
+                        <div class="exercise-filters locator-filters">
+                            <div class="filter-group">
+                                <button class="filter-btn active" data-loc-difficulty="all">All</button>
+                                <button class="filter-btn" data-loc-difficulty="basic">Basic</button>
+                                <button class="filter-btn" data-loc-difficulty="intermediate">Intermediate</button>
+                                <button class="filter-btn" data-loc-difficulty="advanced">Advanced</button>
+                            </div>
+                            <div class="search-group">
+                                <input type="text" id="locator-search" placeholder="🔍 Search exercises..." class="glass-input">
+                            </div>
+                        </div>
+                        <div class="exercises-list" id="locator-container"></div>
                     </div>
                 </div>
             </div>

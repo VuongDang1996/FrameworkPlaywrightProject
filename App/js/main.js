@@ -27,7 +27,8 @@ const MARKDOWN_FILES = [
     { title: '16 🔌 API Testing & CI/CD', url: '../Lerning/16-API-Testing-and-CICD.md' },
     { title: '17 📱 Mobile Emulation', url: '../Lerning/17-Mobile-Emulation-and-Touch.md' },
     { title: '18 ♿ Accessibility Testing', url: '../Lerning/18-Accessibility-Testing.md' },
-    { title: '19 🥒 Cucumber BDD Integration', url: '../Lerning/19-Cucumber-Integration.md' }
+    { title: '19 🥒 Cucumber BDD Integration', url: '../Lerning/19-Cucumber-Integration.md' },
+    { title: '20 🎯 Locator Practice', url: '../Lerning/20-Locator-Practice.md' }
 ];
 
 class App {
@@ -77,6 +78,53 @@ class App {
     initMonaco() {
         require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
         require(['vs/editor/editor.main'], () => {
+            // Configure Javascript defaults
+            monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+                target: monaco.languages.typescript.ScriptTarget.ES2020,
+                allowNonTsExtensions: true
+            });
+
+            // Add Playwright typings for better autocomplete
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(`
+                declare interface Locator {
+                    click(options?: { force?: boolean, timeout?: number }): Promise<void>;
+                    fill(value: string): Promise<void>;
+                    press(key: string, options?: { delay?: number, timeout?: number }): Promise<void>;
+                    check(): Promise<void>;
+                    uncheck(): Promise<void>;
+                    selectOption(values: string | string[]): Promise<void>;
+                    first(): Locator;
+                    last(): Locator;
+                    nth(index: number): Locator;
+                    isVisible(): Promise<boolean>;
+                    isEnabled(): Promise<boolean>;
+                    isDisabled(): Promise<boolean>;
+                    isEditable(): Promise<boolean>;
+                    isChecked(): Promise<boolean>;
+                    isHidden(): Promise<boolean>;
+                    filter(options: { has?: Locator, hasText?: string | RegExp }): Locator;
+                    getByRole(role: "alert" | "alertdialog" | "application" | "article" | "banner" | "button" | "checkbox" | "columnheader" | "combobox" | "complementary" | "contentinfo" | "definition" | "dialog" | "directory" | "document" | "feed" | "figure" | "form" | "grid" | "gridcell" | "group" | "heading" | "img" | "link" | "list" | "listbox" | "listitem" | "log" | "main" | "marquee" | "math" | "menu" | "menubar" | "menuitem" | "menuitemcheckbox" | "menuitemradio" | "navigation" | "none" | "note" | "option" | "presentation" | "progressbar" | "radio" | "radiogroup" | "region" | "row" | "rowgroup" | "rowheader" | "scrollbar" | "search" | "searchbox" | "separator" | "slider" | "spinbutton" | "status" | "tab" | "tablist" | "tabpanel" | "textbox" | "timer" | "toolbar" | "tooltip" | "tree" | "treegrid" | "treeitem", options?: { name?: string | RegExp, exact?: boolean, checked?: boolean, pressed?: boolean, expanded?: boolean, level?: number, selected?: boolean }): Locator;
+                    getByText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByPlaceholder(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByTitle(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByTestId(testId: string | RegExp): Locator;
+                    locator(selector: string, options?: { has?: Locator, hasText?: string | RegExp }): Locator;
+                }
+                declare interface Page {
+                    locator(selector: string, options?: { has?: Locator, hasText?: string | RegExp }): Locator;
+                    getByRole(role: "alert" | "alertdialog" | "application" | "article" | "banner" | "button" | "checkbox" | "columnheader" | "combobox" | "complementary" | "contentinfo" | "definition" | "dialog" | "directory" | "document" | "feed" | "figure" | "form" | "grid" | "gridcell" | "group" | "heading" | "img" | "link" | "list" | "listbox" | "listitem" | "log" | "main" | "marquee" | "math" | "menu" | "menubar" | "menuitem" | "menuitemcheckbox" | "menuitemradio" | "navigation" | "none" | "note" | "option" | "presentation" | "progressbar" | "radio" | "radiogroup" | "region" | "row" | "rowgroup" | "rowheader" | "scrollbar" | "search" | "searchbox" | "separator" | "slider" | "spinbutton" | "status" | "tab" | "tablist" | "tabpanel" | "textbox" | "timer" | "toolbar" | "tooltip" | "tree" | "treegrid" | "treeitem", options?: { name?: string | RegExp, exact?: boolean, checked?: boolean, pressed?: boolean, expanded?: boolean, level?: number, selected?: boolean }): Locator;
+                    getByText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByPlaceholder(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByTitle(text: string | RegExp, options?: { exact?: boolean }): Locator;
+                    getByTestId(testId: string | RegExp): Locator;
+                }
+                declare const page: Page;
+            `, 'playwright.d.ts');
+
             window.monacoLoaded = true;
             document.dispatchEvent(new Event('monaco-loaded'));
         });
@@ -95,8 +143,8 @@ class App {
                 document.querySelectorAll('.mode-pane').forEach(pane => pane.classList.remove('active'));
                 document.getElementById(`${mode}-mode`).classList.add('active');
 
-                // If switching to coding, lay out editors
-                if (mode === 'coding') {
+                // If switching to coding or locator, lay out editors
+                if (mode === 'coding' || mode === 'locator') {
                     // Monaco needs to re-calculate layout when its container becomes visible
                     setTimeout(() => this.renderer.layoutEditors(), 10);
                 }
@@ -131,6 +179,8 @@ class App {
                     localStorage.removeItem('learning_lab_quiz');
                     localStorage.removeItem('learning_lab_code');
                     localStorage.removeItem('learning_lab_solved');
+                    localStorage.removeItem('learning_lab_locator_code');
+                    localStorage.removeItem('learning_lab_locator_solved');
                     this.updateDashboard();
                     if (this.currentDocId) {
                         this.renderDocument(this.currentDocId);
@@ -143,6 +193,20 @@ class App {
         const exportBtn = document.getElementById('export-pdf');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => this.exportToPDF());
+        }
+
+        // Locator Filters
+        document.querySelectorAll('[data-loc-difficulty]').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('[data-loc-difficulty]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.renderLocatorExercisesOnly();
+            };
+        });
+
+        const locSearch = document.getElementById('locator-search');
+        if (locSearch) {
+            locSearch.oninput = () => this.renderLocatorExercisesOnly();
         }
     }
 
@@ -385,6 +449,9 @@ class App {
 
         // 4. Exercises
         this.renderExercisesOnly();
+
+        // 5. Locators
+        this.renderLocatorExercisesOnly();
     }
 
     renderExercisesOnly() {
@@ -397,6 +464,29 @@ class App {
         }
 
         this.renderer.renderExercises(filtered, document.getElementById('exercises-container'));
+    }
+
+    renderLocatorExercisesOnly() {
+        const doc = this.documents[this.currentDocId];
+        if (!doc) return;
+
+        const difficulty = document.querySelector('[data-loc-difficulty].active')?.getAttribute('data-loc-difficulty') || 'all';
+        const searchTerm = document.getElementById('locator-search')?.value.toLowerCase() || '';
+
+        let filtered = doc.data.locators || [];
+        
+        if (difficulty !== 'all') {
+            filtered = filtered.filter(ex => ex.difficulty.toLowerCase() === difficulty);
+        }
+
+        if (searchTerm) {
+            filtered = filtered.filter(ex => 
+                ex.title.toLowerCase().includes(searchTerm) || 
+                (ex.description && ex.description.toLowerCase().includes(searchTerm))
+            );
+        }
+
+        this.renderer.renderLocatorExercises(filtered, document.getElementById('locator-container'));
     }
 
     updateDashboard() {
@@ -460,6 +550,17 @@ class App {
         if (exBasic) exBasic.textContent = `${basicSolved}/${basicTotal}`;
         if (exInter) exInter.textContent = `${interSolved}/${interTotal}`;
         if (exAdv) exAdv.textContent = `${advSolved}/${advTotal}`;
+
+        // Locator Practice
+        const locatorSolved = JSON.parse(localStorage.getItem('learning_lab_locator_solved') || '{}');
+        let totalLocators = 0;
+        Object.values(this.documents).forEach(doc => totalLocators += (doc.data.locators || []).length);
+        const solvedLocators = Object.keys(locatorSolved).length;
+
+        const locStat = document.getElementById('locator-stat');
+        const locProg = document.getElementById('locator-progress');
+        if (locStat) locStat.textContent = `${solvedLocators} / ${totalLocators}`;
+        if (locProg) locProg.style.width = totalLocators > 0 ? `${(solvedLocators / totalLocators) * 100}%` : '0%';
     }
 }
 

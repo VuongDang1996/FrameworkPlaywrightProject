@@ -644,3 +644,221 @@ button {
     display: block;
     animation: fadeIn 0.3s ease;
 }
+
+/* =============== LOCATOR PRACTICE =============== */
+.locator-card {
+    border-left: 4px solid var(--accent-color);
+    background: var(--card-bg);
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.locator-header-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    background: rgba(128, 128, 128, 0.03);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.locator-preview-section {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1000px) {
+    .locator-preview-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pane-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Browser Mockup */
+.browser-mockup {
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.browser-header {
+    height: 32px;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+}
+
+[data-theme="dark"] .browser-header {
+    background: #2d333b;
+}
+
+.browser-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.browser-address-bar {
+    flex: 1;
+    height: 20px;
+    background: white;
+    border-radius: 4px;
+    margin: 0 10px;
+    font-size: 10px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+}
+
+[data-theme="dark"] .browser-address-bar {
+    background: #0d1117;
+}
+
+.preview-content {
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--card-bg);
+    overflow: auto;
+    position: relative;
+}
+
+/* Terminal Source */
+.terminal-source {
+    border-radius: 10px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    overflow: hidden;
+}
+
+.terminal-header {
+    height: 32px;
+    background: #161b22;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.terminal-title {
+    font-size: 11px;
+    color: #8b949e;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.terminal-source pre {
+    margin: 0 !important;
+    height: 160px;
+    overflow: auto;
+    font-size: 0.8rem;
+    background: transparent !important;
+    padding: 1rem !important;
+}
+
+/* Form elements in preview */
+.preview-content button {
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    background: var(--accent-color);
+    color: white;
+    cursor: default;
+    border: none;
+    font-weight: 500;
+}
+
+.preview-content input[type="text"], 
+.preview-content input[type="password"],
+.preview-content input[type="email"] {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    width: 100%;
+    max-width: 250px;
+}
+
+.locator-editor {
+    height: 70px !important;
+    border: 1px solid var(--accent-color);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.locator-filters {
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: none;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.search-group {
+    flex: 1;
+    max-width: 400px;
+    margin-left: 2rem;
+}
+
+.glass-input {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    padding-left: 2.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    background: rgba(128, 128, 128, 0.05);
+    color: var(--text-color);
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: var(--card-bg);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    outline: none;
+}
+
+@media (max-width: 800px) {
+    .locator-filters {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .search-group {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+.stat-group.locator-stat {
+    border-top: 1px solid var(--glass-border);
+    padding-top: 1rem;
+}
+

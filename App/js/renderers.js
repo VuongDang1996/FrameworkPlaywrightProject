@@ -349,4 +349,207 @@ export class Renderer {
             if(editor) editor.layout();
         });
     }
+
+    renderLocatorExercises(exercises, container) {
+        container.innerHTML = '';
+        if (exercises.length === 0) {
+            container.innerHTML = '<p>No locator exercises found in this document.</p>';
+            return;
+        }
+
+        const savedLocators = JSON.parse(localStorage.getItem('learning_lab_locator_code') || '{}');
+
+        exercises.forEach((ex, index) => {
+            const card = document.createElement('div');
+            card.className = 'exercise-card locator-card';
+
+            const headerMeta = document.createElement('div');
+            headerMeta.className = 'locator-header-meta';
+            headerMeta.innerHTML = `
+                <span>Exercise ${index + 1} of ${exercises.length}</span>
+                <span>${ex.difficulty.toUpperCase()}</span>
+            `;
+
+            const header = document.createElement('div');
+            header.className = 'exercise-header';
+            header.innerHTML = `
+                <div class="exercise-title">${ex.title}</div>
+                <div class="badge ${ex.difficulty.toLowerCase()}">${ex.difficulty}</div>
+            `;
+
+            const body = document.createElement('div');
+            body.className = 'exercise-body';
+
+            if (ex.description) {
+                const desc = document.createElement('div');
+                desc.className = 'exercise-desc';
+                desc.innerHTML = marked.parse(ex.description);
+                body.appendChild(desc);
+            }
+
+            // Enhanced Target HTML Preview (Browser Mockup) & Source (Terminal)
+            const previewSection = document.createElement('div');
+            previewSection.className = 'locator-preview-section';
+            previewSection.innerHTML = `
+                <div class="pane-group">
+                    <div class="pane-label">🌐 Live Preview</div>
+                    <div class="browser-mockup">
+                        <div class="browser-header">
+                            <div class="browser-dot dot-red"></div>
+                            <div class="browser-dot dot-yellow"></div>
+                            <div class="browser-dot dot-green"></div>
+                            <div class="browser-address-bar">http://learning-lab.local/exercise-${index + 1}</div>
+                        </div>
+                        <div class="preview-content">${ex.targetHtml}</div>
+                    </div>
+                </div>
+                <div class="pane-group">
+                    <div class="pane-label">📄 HTML Source</div>
+                    <div class="terminal-source">
+                        <div class="terminal-header">
+                            <div class="terminal-title">view-source.html</div>
+                        </div>
+                        <pre class="language-html"><code>${this.escapeHtml(ex.targetHtml)}</code></pre>
+                    </div>
+                </div>
+            `;
+            body.appendChild(previewSection);
+
+            const editorLabel = document.createElement('div');
+            editorLabel.className = 'pane-label';
+            editorLabel.innerHTML = '⌨️ Enter Locator';
+            body.appendChild(editorLabel);
+
+            const editorId = `loc_editor_${ex.id}`;
+            const editorDiv = document.createElement('div');
+            editorDiv.id = editorId;
+            editorDiv.className = 'editor-container locator-editor';
+            body.appendChild(editorDiv);
+
+            const controls = document.createElement('div');
+            controls.className = 'exercise-controls';
+
+            const runBtn = document.createElement('button');
+            runBtn.className = 'btn-primary';
+            runBtn.textContent = 'Check Locator';
+            runBtn.onclick = () => this.runLocatorValidation(ex, editorId);
+
+            const solBtn = document.createElement('button');
+            solBtn.className = 'btn-secondary';
+            solBtn.textContent = 'Show Hint';
+            
+            const solutionBox = document.createElement('div');
+            solutionBox.className = 'solution-box';
+            solutionBox.innerHTML = `<p style="margin-bottom:0.5rem; font-weight:600; font-size:0.85rem; color:var(--accent-color)">💡 Hint: One possible solution is:</p>
+                                     <code style="display:block; background:rgba(0,0,0,0.2); padding:0.5rem; border-radius:4px; font-size:0.9rem">${this.escapeHtml(ex.expectedLocators[0])}</code>`;
+
+            solBtn.onclick = () => {
+                solutionBox.classList.toggle('show');
+            };
+
+            controls.appendChild(runBtn);
+            controls.appendChild(solBtn);
+            body.appendChild(controls);
+
+            const feedback = document.createElement('div');
+            feedback.id = `loc_feedback_${ex.id}`;
+            feedback.className = 'feedback-box';
+            body.appendChild(feedback);
+            body.appendChild(solutionBox);
+
+            card.appendChild(headerMeta);
+            card.appendChild(header);
+            card.appendChild(body);
+            container.appendChild(card);
+
+            // Setup initialization queue for Monaco
+            const initEditor = () => {
+                this.initMonaco(editorId, 'javascript', savedLocators[ex.id] || 'page.', ex.id, 'locator');
+            };
+
+            if (window.monacoLoaded) {
+                setTimeout(initEditor, 50);
+            } else {
+                document.addEventListener('monaco-loaded', initEditor);
+            }
+            
+            // Highlight source code
+            if (window.Prism) {
+                Prism.highlightAllUnder(previewSection);
+            }
+        });
+    }
+
+    // Overload initMonaco slightly to handle different storage keys
+    initMonaco(editorId, lang, initialCode, exId, type = 'coding') {
+        const el = document.getElementById(editorId);
+        if (!el || !window.monaco) return;
+        
+        if(this.editors[editorId]) {
+            this.editors[editorId].dispose();
+        }
+
+        const editor = window.monaco.editor.create(el, {
+            value: initialCode,
+            language: lang,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'vs',
+            automaticLayout: true,
+            minimap: { enabled: false },
+            fontSize: 14,
+            scrollBeyondLastLine: false,
+            roundedSelection: false,
+        });
+
+        this.editors[editorId] = editor;
+
+        let debounceTimer;
+        editor.onDidChangeModelContent(() => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const code = editor.getValue();
+                const storageKey = type === 'locator' ? 'learning_lab_locator_code' : 'learning_lab_code';
+                const savedData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                savedData[exId] = code;
+                localStorage.setItem(storageKey, JSON.stringify(savedData));
+            }, 500);
+        });
+    }
+
+    runLocatorValidation(ex, editorId) {
+        const editor = this.editors[editorId];
+        if (!editor) return;
+
+        const userLocator = editor.getValue().trim();
+        const feedback = document.getElementById(`loc_feedback_${ex.id}`);
+        feedback.className = 'feedback-box';
+
+        // Normalized comparison
+        const normalizedUser = userLocator.replace(/\s+/g, '').replace(/['"]/g, "'");
+        const isCorrect = ex.expectedLocators.some(expected => {
+            const normalizedExpected = expected.replace(/\s+/g, '').replace(/['"]/g, "'");
+            return normalizedUser === normalizedExpected;
+        });
+
+        if (isCorrect) {
+            feedback.innerHTML = '✅ Correct! This locator accurately identifies the element.';
+            feedback.classList.add('success');
+            
+            const solved = JSON.parse(localStorage.getItem('learning_lab_locator_solved') || '{}');
+            solved[ex.id] = ex.difficulty;
+            localStorage.setItem('learning_lab_locator_solved', JSON.stringify(solved));
+            document.dispatchEvent(new Event('progress-updated'));
+        } else {
+            feedback.innerHTML = '❌ Incorrect. Try a different locator strategy.';
+            feedback.classList.add('error');
+        }
+    }
+
+    escapeHtml(unsafe) {
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+    }
 }
